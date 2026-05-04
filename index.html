@@ -6,46 +6,48 @@
 
 <style>
 body {
-  background: #1A0F0F;
+  background: #0F172A;
   font-family: sans-serif;
   margin: 0;
   padding: 20px;
-  color: #FFE4E6;
+  color: #E2E8F0;
 }
 
 /* Section Box */
 .section {
-  border: 2px solid #3B0A0A;
+  border: 2px solid #1E293B;
   border-radius: 12px;
   padding: 15px;
-  background: #140909;
+  background: #0F172A;
 }
 
 /* Title */
 .section-title {
-  background: linear-gradient(145deg, #3B0A0A, #1A0F0F);
+  background: linear-gradient(145deg, #1E293B, #0F172A);
   border-radius: 30px;
   padding: 10px;
   text-align: center;
   margin-bottom: 15px;
-  color: #FFE4E6;
+  color: #22C55E;
   font-weight: bold;
   letter-spacing: 1px;
 }
 
 /* Partner Card */
 .partner-card {
-  background: #1A0F0F;
-  border: 1px solid #3B0A0A;
+  background: #1E293B;
+  border: 1px solid #1E293B;
   border-radius: 14px;
   padding: 15px;
   text-align: center;
   margin-bottom: 12px;
   transition: 0.2s;
+  cursor: pointer;
 }
 
 .partner-card:hover {
   transform: scale(1.03);
+  border-color: #22C55E;
 }
 
 /* Image */
@@ -60,7 +62,7 @@ body {
 /* Name */
 .partner-name {
   font-size: 14px;
-  color: #FFE4E6;
+  color: #E2E8F0;
 }
 </style>
 </head>
@@ -102,7 +104,7 @@ partners.forEach(p => {
 
   // Click to open link
   card.onclick = () => {
-    window.open(p.link, "_blank");
+    if(p.link) window.open(p.link, "_blank");
   };
 
   container.appendChild(card);

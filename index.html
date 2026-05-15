@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Vienna Gambit Auto Replay</title>
+<title>vienna gambit</title>
 
 <style>
 
@@ -14,7 +14,6 @@ body{
 margin:0;
 height:100vh;
 display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
 background:#0b1220;
@@ -22,13 +21,18 @@ font-family:Arial;
 overflow:hidden;
 }
 
+.container{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:10px;
+}
+
 .title{
-color:white;
-font-size:14px;
-letter-spacing:2px;
-margin-bottom:12px;
+color:#ffffffcc;
+font-size:12px;
+letter-spacing:3px;
 text-transform:lowercase;
-opacity:0.8;
 }
 
 .board{
@@ -48,7 +52,6 @@ height:45px;
 display:flex;
 justify-content:center;
 align-items:center;
-position:relative;
 }
 
 .white{
@@ -70,13 +73,17 @@ pointer-events:none;
 
 <body>
 
+<div class="container">
+
 <div class="title">vienna gambit</div>
 
 <div class="board" id="board"></div>
 
+</div>
+
 <script>
 
-const board = document.getElementById("board");
+const board=document.getElementById("board");
 
 /* ================= PIECE IMAGE ================= */
 
@@ -138,11 +145,11 @@ WP8:{type:"wp",square:"h2"}
 
 }
 
-pieces = createPieces();
+pieces=createPieces();
 
-/* ================= DRAW BOARD ================= */
+/* ================= DRAW ================= */
 
-const files = "abcdefgh";
+const files="abcdefgh";
 
 function draw(){
 
@@ -156,7 +163,7 @@ const sq=document.createElement("div");
 
 sq.className="square "+(((r+c)%2)?"white":"black");
 
-const coord = files[c]+r;
+const coord=files[c]+r;
 
 for(let id in pieces){
 
@@ -214,7 +221,7 @@ pieces["WR2"].square="f1";
 
 }
 
-/* ================= MOVES ================= */
+/* ================= VIENNA GAMBIT ================= */
 
 const moves=[
 
@@ -265,7 +272,7 @@ const moves=[
 
 let current=0;
 
-/* ================= PLAY NEXT ================= */
+/* ================= AUTO PLAY ================= */
 
 function playNext(){
 

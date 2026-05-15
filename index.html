@@ -5,6 +5,7 @@
 <title>Vienna Gambit Auto Replay</title>
 
 <style>
+
 *{
 box-sizing:border-box;
 }
@@ -67,6 +68,7 @@ line-height:1.7;
 box-shadow:0 0 15px rgba(0,0,0,0.5);
 min-height:110px;
 }
+
 </style>
 </head>
 
@@ -81,7 +83,7 @@ min-height:110px;
 const board = document.getElementById("board");
 const moveBox = document.getElementById("moveBox");
 
-/* ================= PIECE IMAGES ================= */
+/* ================= PIECE IMAGE ================= */
 
 function pieceImg(type){
 
@@ -89,11 +91,15 @@ return `https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${type}.png
 
 }
 
-/* ================= UNIQUE PIECES ================= */
+/* ================= START POSITION ================= */
 
-let pieces = {
+let pieces;
 
-/* BLACK */
+function createPieces(){
+
+return {
+
+/* BLACK PIECES */
 
 BR1:{type:"br",square:"a8"},
 BN1:{type:"bn",square:"b8"},
@@ -113,7 +119,7 @@ BP6:{type:"bp",square:"f7"},
 BP7:{type:"bp",square:"g7"},
 BP8:{type:"bp",square:"h7"},
 
-/* WHITE */
+/* WHITE PIECES */
 
 WR1:{type:"wr",square:"a1"},
 WN1:{type:"wn",square:"b1"},
@@ -135,7 +141,11 @@ WP8:{type:"wp",square:"h2"}
 
 };
 
-/* ================= BOARD DRAW ================= */
+}
+
+pieces = createPieces();
+
+/* ================= DRAW BOARD ================= */
 
 const files = "abcdefgh";
 
@@ -175,7 +185,7 @@ board.appendChild(sq);
 
 }
 
-/* ================= MOVE FUNCTION ================= */
+/* ================= MOVE ================= */
 
 function move(piece,to){
 
@@ -254,21 +264,24 @@ const moves=[
 ["WB2","h7","13. Bxh7+"],
 ["BK1","h7","... Kxh7"],
 
-["WN2","g5","14. Ng5+"],
-["BB1","g5","... Bxg5"],
-
-["WB1","g5","15. Bxg5"]
+["WN2","g5","14. Ng5+"]
 
 ];
 
 let current=0;
 let history="";
 
-/* ================= AUTO PLAY ================= */
+/* ================= PLAY NEXT ================= */
 
 function playNext(){
 
-if(current>=moves.length) return;
+if(current>=moves.length){
+
+setTimeout(resetBoard,2000);
+
+return;
+
+}
 
 const [piece,to,text]=moves[current];
 
@@ -296,13 +309,32 @@ draw();
 
 current++;
 
+setTimeout(playNext,1200);
+
+}
+
+/* ================= RESET ================= */
+
+function resetBoard(){
+
+pieces = createPieces();
+
+current = 0;
+history = "";
+
+moveBox.innerText = "";
+
+draw();
+
+setTimeout(playNext,1200);
+
 }
 
 /* ================= START ================= */
 
 draw();
 
-setInterval(playNext,1200);
+playNext();
 
 </script>
 

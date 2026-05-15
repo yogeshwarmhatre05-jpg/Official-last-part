@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Vienna Gambit Chess Viewer</title>
+<title>Vienna Gambit Auto Replay</title>
 
 <style>
 *{
@@ -18,7 +18,7 @@ justify-content:center;
 align-items:center;
 background:#0b1220;
 font-family:Arial;
-gap:20px;
+overflow:hidden;
 }
 
 .board{
@@ -29,7 +29,8 @@ grid-template-columns:repeat(8,45px);
 grid-template-rows:repeat(8,45px);
 border-radius:12px;
 overflow:hidden;
-box-shadow:0 0 25px rgba(0,0,0,0.6);
+box-shadow:0 0 25px rgba(0,0,0,0.7);
+margin-bottom:18px;
 }
 
 .square{
@@ -52,423 +53,256 @@ background:#769656;
 .square img{
 width:85%;
 height:85%;
+pointer-events:none;
 }
 
-.controls{
-display:flex;
-gap:12px;
-}
-
-button{
-padding:10px 18px;
-border:none;
-border-radius:8px;
-background:#2563eb;
-color:white;
-font-size:15px;
-cursor:pointer;
-}
-
-button:hover{
-background:#1d4ed8;
-}
-
-#moveText{
+#moveBox{
 width:360px;
 background:#111827;
 color:white;
-padding:12px;
+padding:14px;
 border-radius:10px;
-font-size:14px;
-line-height:1.6;
-box-shadow:0 0 10px rgba(0,0,0,0.5);
+font-size:15px;
+line-height:1.7;
+box-shadow:0 0 15px rgba(0,0,0,0.5);
+min-height:110px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="board" class="board"></div>
+<div class="board" id="board"></div>
 
-<div class="controls">
-<button onclick="prevMove()">◀ Previous</button>
-<button onclick="nextMove()">Next ▶</button>
-</div>
-
-<div id="moveText"></div>
+<div id="moveBox"></div>
 
 <script>
 
-const boardEl = document.getElementById("board");
-const moveText = document.getElementById("moveText");
-
-/* ================= START POSITION ================= */
-
-const startPosition = [
-"r","n","b","q","k","b","n","r",
-"p","p","p","p","p","p","p","p",
-"","","","","","","","",
-"","","","","","","","",
-"","","","","","","","",
-"","","","","","","","",
-"P","P","P","P","P","P","P","P",
-"R","N","B","Q","K","B","N","R"
-];
-
-let position = [...startPosition];
+const board = document.getElementById("board");
+const moveBox = document.getElementById("moveBox");
 
 /* ================= PIECE IMAGES ================= */
 
-function mapPiece(p){
-return {
-r:"br",
-n:"bn",
-b:"bb",
-q:"bq",
-k:"bk",
-p:"bp",
-R:"wr",
-N:"wn",
-B:"wb",
-Q:"wq",
-K:"wk",
-P:"wp"
-}[p];
-}
+function pieceImg(type){
 
-function pieceImg(p){
-return `https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${mapPiece(p)}.png`;
-}
-
-/* ================= DRAW BOARD ================= */
-
-function draw(){
-
-boardEl.innerHTML = "";
-
-position.forEach((p,i)=>{
-
-const sq = document.createElement("div");
-
-const r = Math.floor(i/8);
-const c = i%8;
-
-sq.className = "square " + ((r+c)%2 ? "black":"white");
-
-if(p){
-
-const img = document.createElement("img");
-img.src = pieceImg(p);
-
-sq.appendChild(img);
-}
-
-boardEl.appendChild(sq);
-
-});
+return `https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${type}.png`;
 
 }
 
-/* ================= MOVE HELPERS ================= */
+/* ================= UNIQUE PIECES ================= */
 
-function idx(file,rank){
+let pieces = {
+
+/* BLACK */
+
+BR1:{type:"br",square:"a8"},
+BN1:{type:"bn",square:"b8"},
+BB1:{type:"bb",square:"c8"},
+BQ1:{type:"bq",square:"d8"},
+BK1:{type:"bk",square:"e8"},
+BB2:{type:"bb",square:"f8"},
+BN2:{type:"bn",square:"g8"},
+BR2:{type:"br",square:"h8"},
+
+BP1:{type:"bp",square:"a7"},
+BP2:{type:"bp",square:"b7"},
+BP3:{type:"bp",square:"c7"},
+BP4:{type:"bp",square:"d7"},
+BP5:{type:"bp",square:"e7"},
+BP6:{type:"bp",square:"f7"},
+BP7:{type:"bp",square:"g7"},
+BP8:{type:"bp",square:"h7"},
+
+/* WHITE */
+
+WR1:{type:"wr",square:"a1"},
+WN1:{type:"wn",square:"b1"},
+WB1:{type:"wb",square:"c1"},
+WQ1:{type:"wq",square:"d1"},
+WK1:{type:"wk",square:"e1"},
+WB2:{type:"wb",square:"f1"},
+WN2:{type:"wn",square:"g1"},
+WR2:{type:"wr",square:"h1"},
+
+WP1:{type:"wp",square:"a2"},
+WP2:{type:"wp",square:"b2"},
+WP3:{type:"wp",square:"c2"},
+WP4:{type:"wp",square:"d2"},
+WP5:{type:"wp",square:"e2"},
+WP6:{type:"wp",square:"f2"},
+WP7:{type:"wp",square:"g2"},
+WP8:{type:"wp",square:"h2"}
+
+};
+
+/* ================= BOARD DRAW ================= */
 
 const files = "abcdefgh";
 
-const c = files.indexOf(file);
-const r = 8-rank;
+function draw(){
 
-return r*8+c;
-}
+board.innerHTML="";
 
-function move(from,to){
+for(let r=8;r>=1;r--){
 
-position[to]=position[from];
-position[from]="";
+for(let c=0;c<8;c++){
 
-}
+const sq=document.createElement("div");
 
-/* ================= VIENNA GAMBIT MAIN LINE ================= */
+sq.className="square "+(((r+c)%2)?"white":"black");
 
-const moves = [
+const coord = files[c]+r;
 
-{
-text:"1. e4",
-play(){
-move(idx("e",2),idx("e",4));
-}
-},
+for(let id in pieces){
 
-{
-text:"... e5",
-play(){
-move(idx("e",7),idx("e",5));
-}
-},
+if(pieces[id].square===coord){
 
-{
-text:"2. Nc3",
-play(){
-move(idx("b",1),idx("c",3));
-}
-},
+const img=document.createElement("img");
 
-{
-text:"... Nf6",
-play(){
-move(idx("g",8),idx("f",6));
-}
-},
+img.src=pieceImg(pieces[id].type);
 
-{
-text:"3. f4",
-play(){
-move(idx("f",2),idx("f",4));
-}
-},
-
-{
-text:"... d5",
-play(){
-move(idx("d",7),idx("d",5));
-}
-},
-
-{
-text:"4. fxe5",
-play(){
-move(idx("f",4),idx("e",5));
-}
-},
-
-{
-text:"... Nxe4",
-play(){
-move(idx("f",6),idx("e",4));
-}
-},
-
-{
-text:"5. Nf3",
-play(){
-move(idx("g",1),idx("f",3));
-}
-},
-
-{
-text:"... Be7",
-play(){
-move(idx("f",8),idx("e",7));
-}
-},
-
-{
-text:"6. d3",
-play(){
-move(idx("d",2),idx("d",3));
-}
-},
-
-{
-text:"... Nxc3",
-play(){
-move(idx("e",4),idx("c",3));
-}
-},
-
-{
-text:"7. bxc3",
-play(){
-move(idx("b",2),idx("c",3));
-}
-},
-
-{
-text:"... O-O",
-play(){
-
-position[idx("g",8)]="k";
-position[idx("f",8)]="r";
-
-position[idx("e",8)]="";
-position[idx("h",8)]="";
+sq.appendChild(img);
 
 }
-},
-
-{
-text:"8. d4",
-play(){
-move(idx("d",3),idx("d",4));
-}
-},
-
-{
-text:"... c5",
-play(){
-move(idx("c",7),idx("c",5));
-}
-},
-
-{
-text:"9. Bd3",
-play(){
-move(idx("f",1),idx("d",3));
-}
-},
-
-{
-text:"... Nc6",
-play(){
-move(idx("b",8),idx("c",6));
-}
-},
-
-{
-text:"10. O-O",
-play(){
-
-position[idx("g",1)]="K";
-position[idx("f",1)]="R";
-
-position[idx("e",1)]="";
-position[idx("h",1)]="";
 
 }
-},
 
-{
-text:"... Bg4",
-play(){
-move(idx("c",8),idx("g",4));
-}
-},
+board.appendChild(sq);
 
-{
-text:"11. Be3",
-play(){
-move(idx("d",2),idx("e",3));
 }
-},
 
-{
-text:"... Qa5",
-play(){
-move(idx("d",8),idx("a",5));
 }
-},
 
-{
-text:"12. Qe1",
-play(){
-move(idx("d",1),idx("e",1));
 }
-},
 
-{
-text:"... c4",
-play(){
-move(idx("c",5),idx("c",4));
-}
-},
+/* ================= MOVE FUNCTION ================= */
 
-{
-text:"13. Bxh7+",
-play(){
-move(idx("d",3),idx("h",7));
-}
-},
+function move(piece,to){
 
-{
-text:"... Kxh7",
-play(){
-move(idx("g",8),idx("h",7));
-}
-},
+for(let id in pieces){
 
-{
-text:"14. Ng5+",
-play(){
-move(idx("f",3),idx("g",5));
-}
-},
+if(id!==piece && pieces[id].square===to){
 
-{
-text:"... Bxg5",
-play(){
-move(idx("g",4),idx("g",5));
-}
-},
+delete pieces[id];
 
-{
-text:"15. Bxg5",
-play(){
-move(idx("e",3),idx("g",5));
 }
+
 }
+
+pieces[piece].square=to;
+
+}
+
+/* ================= CASTLING ================= */
+
+function castleBlack(){
+
+pieces["BK1"].square="g8";
+pieces["BR2"].square="f8";
+
+}
+
+function castleWhite(){
+
+pieces["WK1"].square="g1";
+pieces["WR2"].square="f1";
+
+}
+
+/* ================= VIENNA GAMBIT ================= */
+
+const moves=[
+
+["WP5","e4","1. e4"],
+["BP5","e5","... e5"],
+
+["WN1","c3","2. Nc3"],
+["BN2","f6","... Nf6"],
+
+["WP6","f4","3. f4"],
+["BP4","d5","... d5"],
+
+["WP6","e5","4. fxe5"],
+["BN2","e4","... Nxe4"],
+
+["WN2","f3","5. Nf3"],
+["BB2","e7","... Be7"],
+
+["WP4","d3","6. d3"],
+["BN2","c3","... Nxc3"],
+
+["WP2","c3","7. bxc3"],
+
+["castleBlack","","... O-O"],
+
+["WP4","d4","8. d4"],
+["BP3","c5","... c5"],
+
+["WB2","d3","9. Bd3"],
+["BN1","c6","... Nc6"],
+
+["castleWhite","","10. O-O"],
+
+["BB1","g4","... Bg4"],
+
+["WB1","e3","11. Be3"],
+["BQ1","a5","... Qa5"],
+
+["WQ1","e1","12. Qe1"],
+["BP3","c4","... c4"],
+
+["WB2","h7","13. Bxh7+"],
+["BK1","h7","... Kxh7"],
+
+["WN2","g5","14. Ng5+"],
+["BB1","g5","... Bxg5"],
+
+["WB1","g5","15. Bxg5"]
 
 ];
 
-let currentMove = 0;
+let current=0;
+let history="";
 
-/* ================= UPDATE TEXT ================= */
+/* ================= AUTO PLAY ================= */
 
-function updateText(){
+function playNext(){
 
-let txt = "";
+if(current>=moves.length) return;
 
-for(let i=0;i<currentMove;i++){
+const [piece,to,text]=moves[current];
 
-txt += moves[i].text + " ";
+if(piece==="castleBlack"){
+
+castleBlack();
+
+}
+else if(piece==="castleWhite"){
+
+castleWhite();
+
+}
+else{
+
+move(piece,to);
 
 }
 
-moveText.innerText = txt;
+history += text + " ";
 
-}
-
-/* ================= NEXT ================= */
-
-function nextMove(){
-
-if(currentMove >= moves.length) return;
-
-moves[currentMove].play();
-
-currentMove++;
+moveBox.innerText = history;
 
 draw();
 
-updateText();
-
-}
-
-/* ================= PREVIOUS ================= */
-
-function prevMove(){
-
-if(currentMove<=0) return;
-
-position = [...startPosition];
-
-currentMove--;
-
-for(let i=0;i<currentMove;i++){
-
-moves[i].play();
-
-}
-
-draw();
-
-updateText();
+current++;
 
 }
 
 /* ================= START ================= */
 
 draw();
-updateText();
+
+setInterval(playNext,1200);
 
 </script>
 

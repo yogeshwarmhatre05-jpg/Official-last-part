@@ -22,6 +22,15 @@ font-family:Arial;
 overflow:hidden;
 }
 
+.title{
+color:white;
+font-size:14px;
+letter-spacing:2px;
+margin-bottom:12px;
+text-transform:lowercase;
+opacity:0.8;
+}
+
 .board{
 width:360px;
 height:360px;
@@ -31,7 +40,6 @@ grid-template-rows:repeat(8,45px);
 border-radius:12px;
 overflow:hidden;
 box-shadow:0 0 25px rgba(0,0,0,0.7);
-margin-bottom:18px;
 }
 
 .square{
@@ -57,31 +65,18 @@ height:85%;
 pointer-events:none;
 }
 
-#moveBox{
-width:360px;
-background:#111827;
-color:white;
-padding:14px;
-border-radius:10px;
-font-size:15px;
-line-height:1.7;
-box-shadow:0 0 15px rgba(0,0,0,0.5);
-min-height:110px;
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="board" id="board"></div>
+<div class="title">vienna gambit</div>
 
-<div id="moveBox"></div>
+<div class="board" id="board"></div>
 
 <script>
 
 const board = document.getElementById("board");
-const moveBox = document.getElementById("moveBox");
 
 /* ================= PIECE IMAGE ================= */
 
@@ -99,7 +94,7 @@ function createPieces(){
 
 return {
 
-/* BLACK PIECES */
+/* BLACK */
 
 BR1:{type:"br",square:"a8"},
 BN1:{type:"bn",square:"b8"},
@@ -119,7 +114,7 @@ BP6:{type:"bp",square:"f7"},
 BP7:{type:"bp",square:"g7"},
 BP8:{type:"bp",square:"h7"},
 
-/* WHITE PIECES */
+/* WHITE */
 
 WR1:{type:"wr",square:"a1"},
 WN1:{type:"wn",square:"b1"},
@@ -219,57 +214,56 @@ pieces["WR2"].square="f1";
 
 }
 
-/* ================= VIENNA GAMBIT ================= */
+/* ================= MOVES ================= */
 
 const moves=[
 
-["WP5","e4","1. e4"],
-["BP5","e5","... e5"],
+["WP5","e4"],
+["BP5","e5"],
 
-["WN1","c3","2. Nc3"],
-["BN2","f6","... Nf6"],
+["WN1","c3"],
+["BN2","f6"],
 
-["WP6","f4","3. f4"],
-["BP4","d5","... d5"],
+["WP6","f4"],
+["BP4","d5"],
 
-["WP6","e5","4. fxe5"],
-["BN2","e4","... Nxe4"],
+["WP6","e5"],
+["BN2","e4"],
 
-["WN2","f3","5. Nf3"],
-["BB2","e7","... Be7"],
+["WN2","f3"],
+["BB2","e7"],
 
-["WP4","d3","6. d3"],
-["BN2","c3","... Nxc3"],
+["WP4","d3"],
+["BN2","c3"],
 
-["WP2","c3","7. bxc3"],
+["WP2","c3"],
 
-["castleBlack","","... O-O"],
+["castleBlack",""],
 
-["WP4","d4","8. d4"],
-["BP3","c5","... c5"],
+["WP4","d4"],
+["BP3","c5"],
 
-["WB2","d3","9. Bd3"],
-["BN1","c6","... Nc6"],
+["WB2","d3"],
+["BN1","c6"],
 
-["castleWhite","","10. O-O"],
+["castleWhite",""],
 
-["BB1","g4","... Bg4"],
+["BB1","g4"],
 
-["WB1","e3","11. Be3"],
-["BQ1","a5","... Qa5"],
+["WB1","e3"],
+["BQ1","a5"],
 
-["WQ1","e1","12. Qe1"],
-["BP3","c4","... c4"],
+["WQ1","e1"],
+["BP3","c4"],
 
-["WB2","h7","13. Bxh7+"],
-["BK1","h7","... Kxh7"],
+["WB2","h7"],
+["BK1","h7"],
 
-["WN2","g5","14. Ng5+"]
+["WN2","g5"]
 
 ];
 
 let current=0;
-let history="";
 
 /* ================= PLAY NEXT ================= */
 
@@ -283,7 +277,7 @@ return;
 
 }
 
-const [piece,to,text]=moves[current];
+const [piece,to]=moves[current];
 
 if(piece==="castleBlack"){
 
@@ -301,10 +295,6 @@ move(piece,to);
 
 }
 
-history += text + " ";
-
-moveBox.innerText = history;
-
 draw();
 
 current++;
@@ -317,12 +307,9 @@ setTimeout(playNext,1200);
 
 function resetBoard(){
 
-pieces = createPieces();
+pieces=createPieces();
 
-current = 0;
-history = "";
-
-moveBox.innerText = "";
+current=0;
 
 draw();
 

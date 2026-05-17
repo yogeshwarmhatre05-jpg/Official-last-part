@@ -21,6 +21,16 @@ font-family:Arial;
 overflow:hidden;
 }
 
+/* MAIN LAYOUT */
+
+.container{
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+/* CHESS BOARD */
+
 .board{
 width:360px;
 height:360px;
@@ -54,12 +64,60 @@ height:85%;
 pointer-events:none;
 }
 
+/* RIGHT SIDE LINKS */
+
+.sidebar{
+height:360px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+gap:20px;
+}
+
+.sidebar button{
+width:180px;
+height:80px;
+border:none;
+border-radius:14px;
+background:#1e293b;
+color:white;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+transition:0.2s;
+box-shadow:0 0 10px rgba(0,0,0,0.4);
+}
+
+.sidebar button:hover{
+transform:scale(1.05);
+background:#334155;
+}
+
 </style>
 </head>
 
 <body>
 
+<div class="container">
+
+<!-- BOARD -->
+
 <div class="board" id="board"></div>
+
+<!-- RIGHT SIDE LINKS -->
+
+<div class="sidebar">
+
+<button onclick="window.open('https://chessitup.com','_blank')">Reviews
+</button>
+
+<button onclick="window.open('https://openingtree.com','_blank')">
+Openings
+</button>
+
+</div>
+
+</div>
 
 <script>
 
